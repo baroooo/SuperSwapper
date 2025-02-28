@@ -15,15 +15,15 @@ contract LogState is Script {
     SUPERTOKEN9000 = vm.envAddress('SUPERTOKEN9000_ADDRESS');
     SUPERSWAPPER_ADDRESS = vm.envAddress('SUPERSWAPPER_ADDRESS');
 
-    console.log('Addresses');
+    console.log('========== Addresses ==========');
     console.log('SuperSwapper address:', SUPERSWAPPER_ADDRESS);
     console.log('SuperToken9000 address:', SUPERTOKEN9000);
     console.log('SuperWETH address:', SUPERWETH);
     console.log('Trader address:', trader);
-    console.log('================================================');
+    console.log("\n");
 
     vm.createSelectFork('http://localhost:9545');
-    console.log('OP-State');
+    console.log('========== OP-State ==========');
     console.log(
       'SuperSwapper balance in ST9000:',
       IERC20(SUPERTOKEN9000).balanceOf(SUPERSWAPPER_ADDRESS)
@@ -31,10 +31,10 @@ contract LogState is Script {
     console.log('SuperSwapper balance in WETH:', IERC20(SUPERWETH).balanceOf(SUPERSWAPPER_ADDRESS));
     console.log('Trader balance in ST9000:', IERC20(SUPERTOKEN9000).balanceOf(trader));
     console.log('Trader balance in WETH:', IERC20(SUPERWETH).balanceOf(trader));
-    console.log('================================================');
+    console.log("\n");
 
     vm.createSelectFork('http://localhost:9546');
-    console.log('Base-State');
+    console.log('========== BASE-State ==========');
     console.log(
       'SuperSwapper balance in ST9000:',
       IERC20(SUPERTOKEN9000).balanceOf(SUPERSWAPPER_ADDRESS)
@@ -46,10 +46,10 @@ contract LogState is Script {
     console.log('SuperSwapper balance in WETH:', IERC20(SUPERWETH).balanceOf(SUPERSWAPPER_ADDRESS));
     console.log('Trader balance in ST9000:', IERC20(SUPERTOKEN9000).balanceOf(trader));
     console.log('Trader balance in WETH:', IERC20(SUPERWETH).balanceOf(trader));
-    console.log('================================================');
+    console.log("\n");
 
     vm.createSelectFork('http://localhost:9547');
-    console.log('Mode-State');
+    console.log('========== MODE-State ==========');
     console.log(
       'SuperSwapper balance in ST9000:',
       IERC20(SUPERTOKEN9000).balanceOf(SUPERSWAPPER_ADDRESS)
@@ -61,5 +61,6 @@ contract LogState is Script {
     console.log('SuperSwapper balance in WETH:', IERC20(SUPERWETH).balanceOf(SUPERSWAPPER_ADDRESS));
     console.log('Trader balance in ST9000:', IERC20(SUPERTOKEN9000).balanceOf(trader));
     console.log('Trader balance in WETH:', IERC20(SUPERWETH).balanceOf(trader));
+    console.log("\n");
   }
 }
