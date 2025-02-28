@@ -67,7 +67,7 @@ contract Liquidity is Script {
   mapping(uint256 => address) public wethAddresses;
 
   // Replace these with your actual token addresses
-  address public tokenA = 0xB53955FfEEeC4845CCc045e94b940DE62FB190AE; // Our SuperchainERC20 token
+  address public tokenA = 0xf793A6B9587e09e6149Ea99Ed638DE0655CcfcB8; // Our SuperchainERC20 token
 
   // Liquidity amounts
   uint256 public amountA = 1000 * 10 ** 18; // 1000 tokens with 18 decimals

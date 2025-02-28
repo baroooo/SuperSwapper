@@ -16,10 +16,12 @@ interface ISuperSwapper {
 
 contract SwapScript is Script {
   // Address of the deployed SuperSwapper contract
-  address public constant SUPERSWAPPER_ADDRESS = 0x4980d56173f6BD9b969fD434Cbf50EDd13D57fc2; // REPLACE WITH ACTUAL ADDRESS
+  address public constant SUPERSWAPPER_ADDRESS = 0xe05ba9c8827072e1508099E1797BA84baC657012; // REPLACE WITH ACTUAL ADDRESS
 
   function run() external {
     vm.createSelectFork('http://localhost:9545');
+
+    vm.startBroadcast();
 
     // Start broadcasting transactions
 
@@ -37,13 +39,12 @@ contract SwapScript is Script {
     uint256[] memory chainIds = new uint256[](1);
     // chainIds[0] = 10; // Optimism
     chainIds[0] = 8453; // Base
-    console.log('balance', IERC20(tokenIn).balanceOf(msg.sender));
-    console.log('balance', IERC20(tokenIn).balanceOf(address(this)));
 
     IERC20(tokenIn).transfer(SUPERSWAPPER_ADDRESS, amounts[0]);
     // Call initiateSwap function
     swapper.initiateSwap(tokenIn, amounts, chainIds);
 
     console.log('Swap initiated successfully!');
+    vm.stopBroadcast();
   }
 }
