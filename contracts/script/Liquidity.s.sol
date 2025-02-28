@@ -75,8 +75,9 @@ contract Liquidity is Script {
   address public tokenA;
 
   // Liquidity amounts
-  uint256 public amountA = 10000 * 10 ** 18; // 10000 tokens with 18 decimals
-  uint256 public amountB = 10 * 10 ** 18; // 10 WETH or equivalent
+
+  mapping(uint256 => uint256) public amountA;
+  mapping(uint256 => uint256) public amountB;
 
   // Swap amounts
   uint256 public swapAmountIn = 1 * 10 ** 18; // Only 0.01 token to swap (0.001% of pool)
@@ -100,6 +101,19 @@ contract Liquidity is Script {
     wethAddresses[8453] = 0x4200000000000000000000000000000000000024; // Base WETH
     wethAddresses[34443] = 0x4200000000000000000000000000000000000024; // Mode WETH
     wethAddresses[130] = 0x4200000000000000000000000000000000000024; // Unichain WETH
+
+    amountA[10] = 10000 * 10 ** 18; // 10000 tokens with 18 decimals on OP
+    amountB[10] = 10 * 10 ** 18; // 10 WETH or equivalent on OP
+
+    amountA[8453] = 10000 * 10 ** 18; // 10000 tokens with 18 decimals on BASE
+    amountB[8453] = 10 * 10 ** 18; // 10 WETH or equivalent on BASE
+
+    amountA[130] = 10000 * 10 ** 18; // 10000 tokens with 18 decimals on UNICHAIN
+    amountB[130] = 10 * 10 ** 18; // 10 WETH or equivalent on UNICHAIN
+
+    amountA[34443] = 11000 * 10 ** 18; // 10000 tokens with 18 decimals on MODE
+    amountB[34443] = 10 * 10 ** 18; // 10 WETH or equivalent on MODE
+
     tokenA = vm.envAddress('SUPERTOKEN9000_ADDRESS');
 
     for (uint256 i = 0; i < rpcUrls.length; i++) {
@@ -123,8 +137,8 @@ contract Liquidity is Script {
       }
 
       // Approve tokens to router
-      IERC20(tokenA).approve(ROUTER, amountA + swapAmountIn);
-      IERC20(tokenB).approve(ROUTER, amountB + swapAmountIn);
+      IERC20(tokenA).approve(ROUTER, amountA[block.chainid] + swapAmountIn);
+      IERC20(tokenB).approve(ROUTER, amountB[block.chainid] + swapAmountIn);
 
       // Check if pair exists
       address pair = IUniswapV2Factory(FACTORY).getPair(tokenA, tokenB);
@@ -134,23 +148,23 @@ contract Liquidity is Script {
       }
 
       // Calculate minimum amounts (usually a percentage of desired amounts, e.g., 95%)
-      uint amountAMin = (amountA * 95) / 100;
-      uint amountBMin = (amountB * 95) / 100;
+      uint amountAMin = (amountA[block.chainid] * 95) / 100;
+      uint amountBMin = (amountB[block.chainid] * 95) / 100;
 
       console.log('Balance of tokenA:', IERC20(tokenA).balanceOf(msg.sender));
       console.log('Balance of tokenB:', IERC20(tokenB).balanceOf(msg.sender));
 
       console.log('Adding liquidity for pair:', pair);
-      console.log('Token A:', tokenA, 'Amount:', amountA);
-      console.log('Token B:', tokenB, 'Amount:', amountB);
+      console.log('Token A:', tokenA, 'Amount:', amountA[block.chainid]);
+      console.log('Token B:', tokenB, 'Amount:', amountB[block.chainid]);
 
       // deploying more capital steady lads
       (uint amountAAdded, uint amountBAdded, uint liquidity) = IUniswapV2Router02(ROUTER)
         .addLiquidity(
           tokenA,
           tokenB,
-          amountA,
-          amountB,
+          amountA[block.chainid],
+          amountB[block.chainid],
           amountAMin,
           amountBMin,
           msg.sender, // LP tokens will be sent to the contract
