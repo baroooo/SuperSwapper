@@ -71,7 +71,7 @@ contract Liquidity is Script {
   mapping(uint256 => address) public wethAddresses;
 
   // Replace these with your actual token addresses
-  address public tokenA = 0xf793A6B9587e09e6149Ea99Ed638DE0655CcfcB8; // Our SuperchainERC20 token
+  address public tokenA;
 
   // Liquidity amounts
   uint256 public amountA = 1000 * 10 ** 18; // 1000 tokens with 18 decimals
@@ -96,6 +96,8 @@ contract Liquidity is Script {
     wethAddresses[10] = 0x4200000000000000000000000000000000000024; // OP Mainnet WETH
     wethAddresses[8453] = 0x4200000000000000000000000000000000000024; // Base WETH
     wethAddresses[34443] = 0x4200000000000000000000000000000000000024; // Mode WETH
+    tokenA = vm.envAddress('SUPERTOKEN9000_ADDRESS');
+
     for (uint256 i = 0; i < rpcUrls.length; i++) {
       string memory rpcUrl = rpcUrls[i];
 

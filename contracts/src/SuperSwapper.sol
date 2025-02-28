@@ -23,13 +23,17 @@ contract SuperSwapper is Ownable {
   IL2ToL2CrossDomainMessenger public constant messenger =
     IL2ToL2CrossDomainMessenger(0x4200000000000000000000000000000000000023);
 
-  address public constant SUPERTOKEN9000 = 0xf793A6B9587e09e6149Ea99Ed638DE0655CcfcB8;
+  address public SUPERTOKEN9000;
   address public constant SUPERWETH = 0x4200000000000000000000000000000000000024;
 
   constructor(address owner_) Ownable() {
     _initializeOwner(owner_);
-    IERC20(SUPERTOKEN9000).approve(address(bridge), type(uint256).max);
     IERC20(SUPERWETH).approve(address(bridge), type(uint256).max);
+  }
+
+  function setSuperToken9000(address superToken9000_) external onlyOwner {
+    SUPERTOKEN9000 = superToken9000_;
+    IERC20(superToken9000_).approve(address(bridge), type(uint256).max);
   }
 
   function setUniswapV2Router(address uniswapV2Router_) external onlyOwner {

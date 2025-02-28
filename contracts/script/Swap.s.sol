@@ -16,9 +16,11 @@ interface ISuperSwapper {
 
 contract SwapScript is Script {
   // Address of the deployed SuperSwapper contract
-  address public constant SUPERSWAPPER_ADDRESS = 0x141Cf3C1Cd0884A9170Aab82815589483EdB1741; // REPLACE WITH ACTUAL ADDRESS
+  address public SUPERSWAPPER_ADDRESS;
 
   function run() external {
+    SUPERSWAPPER_ADDRESS = vm.envAddress('SUPERSWAPPER_ADDRESS');
+
     vm.createSelectFork('http://localhost:9545');
 
     vm.startBroadcast();

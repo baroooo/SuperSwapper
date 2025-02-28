@@ -2,6 +2,7 @@
 pragma solidity ^0.8.25;
 
 import { Script, console } from 'forge-std/Script.sol';
+import { console2 } from 'forge-std/console2.sol';
 import { Vm } from 'forge-std/Vm.sol';
 import { ICreateX } from 'createx/ICreateX.sol';
 
@@ -27,6 +28,9 @@ contract Deploy is Script {
 
   mapping(uint256 => address) public uniswapV2Routers;
 
+  address public deployedSuperSwapper;
+  address public deployedSP9000;
+
   function run() public {
     uniswapV2Routers[10] = 0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2;
     uniswapV2Routers[8453] = 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
@@ -39,6 +43,8 @@ contract Deploy is Script {
       vm.createSelectFork(rpcUrl);
       deployInitialSupplySuperchainERC20Contract();
     }
+
+    outputEnvFile();
   }
 
   function deployInitialSupplySuperchainERC20Contract() public broadcast {
@@ -64,9 +70,17 @@ contract Deploy is Script {
     );
 
     SuperSwapper(addrSuperSwapper).setUniswapV2Router(uniswapV2Routers[block.chainid]);
+    SuperSwapper(addrSuperSwapper).setSuperToken9000(addrSP9000);
 
-    console.log('Deployed InitialSupplySuperchainERC20 contract to: ', addrSP9000);
-    console.log('Deployed SuperSwapper contract to: ', addrSuperSwapper);
+    deployedSP9000 = addrSP9000;
+    deployedSuperSwapper = addrSuperSwapper;
+  }
+
+  function outputEnvFile() public {
+    console.log("======== ENV FILE ========\n");
+    console2.log("SUPERSWAPPER_ADDRESS=%s", deployedSuperSwapper);
+    console2.log("SUPERTOKEN9000_ADDRESS=%s", deployedSP9000);
+    console.log("\n======== END ========");
   }
 
   /// @notice The CREATE2 salt to be used when deploying a contract.
