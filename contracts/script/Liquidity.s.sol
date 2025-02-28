@@ -29,6 +29,27 @@ interface IUniswapV2Router02 {
     uint deadline
   ) external returns (uint amountA, uint amountB, uint liquidity);
 
+  function swapExactTokensForTokens(
+    uint amountIn,
+    uint amountOutMin,
+    address[] calldata path,
+    address to,
+    uint deadline
+  ) external returns (uint[] memory amounts);
+
+  function swapTokensForExactTokens(
+    uint amountOut,
+    uint amountInMax,
+    address[] calldata path,
+    address to,
+    uint deadline
+  ) external returns (uint[] memory amounts);
+
+  function getAmountsOut(
+    uint amountIn,
+    address[] calldata path
+  ) external view returns (uint[] memory amounts);
+
   function WETH() external pure returns (address);
 }
 
@@ -52,6 +73,12 @@ contract Liquidity is Script {
   uint256 public amountA = 1000 * 10 ** 18; // 1000 tokens with 18 decimals
   uint256 public amountB = 1 * 10 ** 18; // 1 WETH or equivalent
 
+  // Swap amounts
+  uint256 public swapAmountIn = 1 * 10 ** 18; // Only 0.01 token to swap (0.001% of pool)
+  uint256 public slippageTolerance = 95; // 95% slippage tolerance for testing
+  bool public performSwap = false; // Flag to determine if we should perform a swap
+  bool public swapTokenAForTokenB = true; // Direction of swap (true = A→B, false = B→A)
+
   // Flag to determine if we should get WETH first
   bool public getWethFirst = true;
 
@@ -66,6 +93,8 @@ contract Liquidity is Script {
     for (uint256 i = 0; i < rpcUrls.length; i++) {
       string memory rpcUrl = rpcUrls[i];
 
+      console.log('--------------------------------');
+      console.log('Starting script for chainId:', block.chainid);
       vm.createSelectFork(rpcUrl);
       address ROUTER = uniswapV2Routers[block.chainid];
       address FACTORY = uniswapV2Factories[block.chainid];
@@ -77,13 +106,13 @@ contract Liquidity is Script {
       // Get WETH first if needed
       if (getWethFirst) {
         console.log('Getting WETH by wrapping ETH');
-        IWETH(WETH).deposit{ value: amountB }();
-        console.log('WETH Balance after wrapping:', IERC20(WETH).balanceOf(address(this)));
+        IWETH(WETH).deposit{ value: 10e18 }();
+        console.log('WETH Balance after wrapping:', IERC20(WETH).balanceOf(msg.sender));
       }
 
       // Approve tokens to router
-      IERC20(tokenA).approve(ROUTER, amountA);
-      IERC20(tokenB).approve(ROUTER, amountB);
+      IERC20(tokenA).approve(ROUTER, amountA + swapAmountIn);
+      IERC20(tokenB).approve(ROUTER, amountB + swapAmountIn);
 
       // Check if pair exists
       address pair = IUniswapV2Factory(FACTORY).getPair(tokenA, tokenB);
@@ -112,7 +141,7 @@ contract Liquidity is Script {
           amountB,
           amountAMin,
           amountBMin,
-          address(this), // LP tokens will be sent to the contract
+          msg.sender, // LP tokens will be sent to the contract
           block.timestamp + 15 minutes // Deadline: 15 minutes from now
         );
 
@@ -120,6 +149,114 @@ contract Liquidity is Script {
       console.log('Token A added:', amountAAdded);
       console.log('Token B added:', amountBAdded);
       console.log('LP tokens received:', liquidity);
+
+      // Perform token swap if enabled
+      if (performSwap) {
+        console.log('Performing token swap...');
+
+        // Check if we have enough token balance for the swap
+        if (swapTokenAForTokenB) {
+          uint256 tokenABalance = IERC20(tokenA).balanceOf(msg.sender);
+          console.log('Available tokenA balance for swap:', tokenABalance);
+          if (tokenABalance < swapAmountIn) {
+            console.log('Not enough tokenA balance for swap. Skipping swap.');
+            vm.stopBroadcast();
+            continue;
+          }
+        } else {
+          uint256 tokenBBalance = IERC20(tokenB).balanceOf(msg.sender);
+          console.log('Available tokenB balance for swap:', tokenBBalance);
+          if (tokenBBalance < swapAmountIn) {
+            console.log('Not enough tokenB balance for swap. Skipping swap.');
+            vm.stopBroadcast();
+            continue;
+          }
+        }
+
+        // Set up the swap path
+        address[] memory path = new address[](2);
+
+        if (swapTokenAForTokenB) {
+          // Swap tokenA for tokenB
+          path[0] = tokenA;
+          path[1] = tokenB;
+
+          console.log('Swapping %s tokenA for tokenB', swapAmountIn);
+
+          // Get expected output amount from router
+          uint[] memory expectedAmounts;
+          try IUniswapV2Router02(ROUTER).getAmountsOut(swapAmountIn, path) returns (
+            uint[] memory amounts
+          ) {
+            expectedAmounts = amounts;
+            console.log('Expected output of tokenB:', expectedAmounts[1]);
+          } catch {
+            console.log('Failed to get expected amounts. Using default calculation.');
+            expectedAmounts = new uint[](2);
+            expectedAmounts[0] = swapAmountIn;
+            expectedAmounts[1] = (swapAmountIn * 9) / 10000; // Conservative estimate
+          }
+
+          // Calculate minimum output amount based on slippage tolerance
+          uint amountOutMin = (expectedAmounts[1] * (100 - slippageTolerance)) / 100;
+          console.log('Minimum output amount (tokenB):', amountOutMin);
+
+          // Execute the swap with minimal slippage protection
+          uint[] memory amounts = IUniswapV2Router02(ROUTER).swapExactTokensForTokens(
+            swapAmountIn,
+            1, // Use minimal slippage protection
+            path,
+            msg.sender,
+            block.timestamp + 15 minutes
+          );
+
+          console.log('Swap executed successfully:');
+          console.log('Input amount of tokenA:', amounts[0]);
+          console.log('Output amount of tokenB:', amounts[1]);
+        } else {
+          // Swap tokenB for tokenA
+          path[0] = tokenB;
+          path[1] = tokenA;
+
+          console.log('Swapping %s tokenB for tokenA', swapAmountIn);
+
+          // Get expected output amount from router
+          uint[] memory expectedAmounts;
+          try IUniswapV2Router02(ROUTER).getAmountsOut(swapAmountIn, path) returns (
+            uint[] memory amounts
+          ) {
+            expectedAmounts = amounts;
+            console.log('Expected output of tokenA:', expectedAmounts[1]);
+          } catch {
+            console.log('Failed to get expected amounts. Using default calculation.');
+            expectedAmounts = new uint[](2);
+            expectedAmounts[0] = swapAmountIn;
+            expectedAmounts[1] = (swapAmountIn * 9) / 10; // Conservative estimate
+          }
+
+          // Calculate minimum output amount based on slippage tolerance
+          uint amountOutMin = (expectedAmounts[1] * (100 - slippageTolerance)) / 100;
+          console.log('Minimum output amount (tokenA):', amountOutMin);
+
+          // Execute the swap with minimal slippage protection
+          uint[] memory amounts = IUniswapV2Router02(ROUTER).swapExactTokensForTokens(
+            swapAmountIn,
+            1, // Use minimal slippage protection
+            path,
+            msg.sender,
+            block.timestamp + 15 minutes
+          );
+
+          console.log('Swap executed successfully:');
+          console.log('Input amount of tokenB:', amounts[0]);
+          console.log('Output amount of tokenA:', amounts[1]);
+        }
+
+        // Log updated balances after swap
+        console.log('Updated balance of tokenA:', IERC20(tokenA).balanceOf(msg.sender));
+        console.log('Updated balance of tokenB:', IERC20(tokenB).balanceOf(msg.sender));
+      }
+
       vm.stopBroadcast();
     }
   }
