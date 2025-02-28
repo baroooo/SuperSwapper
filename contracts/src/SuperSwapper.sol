@@ -86,8 +86,7 @@ contract SuperSwapper is Ownable {
     address tokenIn,
     uint256 amountIn
   ) external {
-    // TODO: Add this back in
-    // CrossDomainMessageLib.requireCrossDomainCallback();
+    CrossDomainMessageLib.requireCrossDomainCallback();
     (address tokenOut, uint256 amountOut) = _executeSwap(tokenIn, amountIn);
     bridge.sendERC20(tokenOut, receiver, amountOut, sourceChainId);
   }

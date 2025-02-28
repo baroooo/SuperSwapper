@@ -21,7 +21,7 @@ contract SwapScript is Script {
   function run() external {
     SUPERSWAPPER_ADDRESS = vm.envAddress('SUPERSWAPPER_ADDRESS');
 
-    vm.createSelectFork('http://localhost:9545');
+    vm.createSelectFork('http://localhost:9546');
 
     vm.startBroadcast();
 
