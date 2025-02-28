@@ -16,7 +16,8 @@ contract Deploy is Script {
   string[] private rpcUrls = [
     'http://localhost:9545',
     'http://localhost:9546',
-    'http://localhost:9547'
+    'http://localhost:9547',
+    'http://localhost:9548'
   ];
 
   /// @notice Modifier that wraps a function in broadcasting.
@@ -34,6 +35,7 @@ contract Deploy is Script {
   function run() public {
     uniswapV2Routers[10] = 0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2;
     uniswapV2Routers[8453] = 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
+    uniswapV2Routers[130] = 0x284F11109359a7e1306C3e447ef14D38400063FF;
     uniswapV2Routers[34443] = 0x28108b86bb717A3557fb5d4A05A9249333dd7c96;
 
     for (uint256 i = 0; i < rpcUrls.length; i++) {
@@ -77,10 +79,10 @@ contract Deploy is Script {
   }
 
   function outputEnvFile() public {
-    console.log("======== ENV FILE ========\n");
-    console2.log("SUPERSWAPPER_ADDRESS=%s", deployedSuperSwapper);
-    console2.log("SUPERTOKEN9000_ADDRESS=%s", deployedSP9000);
-    console.log("\n======== END ========");
+    console.log('======== ENV FILE ========\n');
+    console2.log('SUPERSWAPPER_ADDRESS=%s', deployedSuperSwapper);
+    console2.log('SUPERTOKEN9000_ADDRESS=%s', deployedSP9000);
+    console.log('\n======== END ========');
   }
 
   /// @notice The CREATE2 salt to be used when deploying a contract.

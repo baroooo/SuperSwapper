@@ -62,7 +62,8 @@ contract Liquidity is Script {
   string[] private rpcUrls = [
     'http://localhost:9545',
     'http://localhost:9546',
-    'http://localhost:9547'
+    'http://localhost:9547',
+    'http://localhost:9548'
   ];
 
   // Uniswap V2 Factory on Ethereum mainnet
@@ -74,8 +75,8 @@ contract Liquidity is Script {
   address public tokenA;
 
   // Liquidity amounts
-  uint256 public amountA = 1000 * 10 ** 18; // 1000 tokens with 18 decimals
-  uint256 public amountB = 1 * 10 ** 18; // 1 WETH or equivalent
+  uint256 public amountA = 10000 * 10 ** 18; // 10000 tokens with 18 decimals
+  uint256 public amountB = 10 * 10 ** 18; // 10 WETH or equivalent
 
   // Swap amounts
   uint256 public swapAmountIn = 1 * 10 ** 18; // Only 0.01 token to swap (0.001% of pool)
@@ -90,12 +91,15 @@ contract Liquidity is Script {
     uniswapV2Factories[10] = 0x0c3c1c532F1e39EdF36BE9Fe0bE1410313E074Bf;
     uniswapV2Factories[8453] = 0x8909Dc15e40173Ff4699343b6eB8132c65e18eC6;
     uniswapV2Factories[34443] = 0x50fD14F0eba5A678c1eBC16bDd3794f09362a95C;
+    uniswapV2Factories[130] = 0x1F98400000000000000000000000000000000002;
     uniswapV2Routers[10] = 0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2;
     uniswapV2Routers[8453] = 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
     uniswapV2Routers[34443] = 0x28108b86bb717A3557fb5d4A05A9249333dd7c96;
+    uniswapV2Routers[130] = 0x284F11109359a7e1306C3e447ef14D38400063FF;
     wethAddresses[10] = 0x4200000000000000000000000000000000000024; // OP Mainnet WETH
     wethAddresses[8453] = 0x4200000000000000000000000000000000000024; // Base WETH
     wethAddresses[34443] = 0x4200000000000000000000000000000000000024; // Mode WETH
+    wethAddresses[130] = 0x4200000000000000000000000000000000000024; // Unichain WETH
     tokenA = vm.envAddress('SUPERTOKEN9000_ADDRESS');
 
     for (uint256 i = 0; i < rpcUrls.length; i++) {

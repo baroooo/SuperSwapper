@@ -39,25 +39,31 @@ contract LogState is Script {
       'SuperSwapper balance in ST9000:',
       IERC20(SUPERTOKEN9000).balanceOf(SUPERSWAPPER_ADDRESS)
     );
+    console.log('SuperSwapper balance in WETH:', IERC20(SUPERWETH).balanceOf(SUPERSWAPPER_ADDRESS));
+    console.log('Trader balance in ST9000:', IERC20(SUPERTOKEN9000).balanceOf(trader));
+    console.log('Trader balance in WETH:', IERC20(SUPERWETH).balanceOf(trader));
+
+    console.log('================================================');
+
+    vm.createSelectFork('http://localhost:9547');
+    console.log('Unichain-State');
     console.log(
-      'SuperSwapper allowance on WETH for UNISwap:',
-      IERC20(SUPERWETH).allowance(SUPERSWAPPER_ADDRESS, UNISwapBase)
+      'SuperSwapper balance in ST9000:',
+      IERC20(SUPERTOKEN9000).balanceOf(SUPERSWAPPER_ADDRESS)
     );
+
     console.log('SuperSwapper balance in WETH:', IERC20(SUPERWETH).balanceOf(SUPERSWAPPER_ADDRESS));
     console.log('Trader balance in ST9000:', IERC20(SUPERTOKEN9000).balanceOf(trader));
     console.log('Trader balance in WETH:', IERC20(SUPERWETH).balanceOf(trader));
     console.log('================================================');
 
-    vm.createSelectFork('http://localhost:9547');
+    vm.createSelectFork('http://localhost:9548');
     console.log('Mode-State');
     console.log(
       'SuperSwapper balance in ST9000:',
       IERC20(SUPERTOKEN9000).balanceOf(SUPERSWAPPER_ADDRESS)
     );
-    console.log(
-      'SuperSwapper allowance on WETH for UNISwap:',
-      IERC20(SUPERWETH).allowance(SUPERSWAPPER_ADDRESS, UNISwapBase)
-    );
+
     console.log('SuperSwapper balance in WETH:', IERC20(SUPERWETH).balanceOf(SUPERSWAPPER_ADDRESS));
     console.log('Trader balance in ST9000:', IERC20(SUPERTOKEN9000).balanceOf(trader));
     console.log('Trader balance in WETH:', IERC20(SUPERWETH).balanceOf(trader));
