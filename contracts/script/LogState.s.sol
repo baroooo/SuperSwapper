@@ -8,7 +8,7 @@ import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 contract LogState is Script {
   address public constant SUPERTOKEN9000 = 0xf793A6B9587e09e6149Ea99Ed638DE0655CcfcB8;
   address public constant SUPERWETH = 0x4200000000000000000000000000000000000024;
-  address public constant SUPERSWAPPER_ADDRESS = 0xe05ba9c8827072e1508099E1797BA84baC657012; // REPLACE WITH ACTUAL ADDRESS
+  address public constant SUPERSWAPPER_ADDRESS = 0x141Cf3C1Cd0884A9170Aab82815589483EdB1741; // REPLACE WITH ACTUAL ADDRESS
   address public constant trader = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
   address public constant UNISwapBase = 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
   function run() external {

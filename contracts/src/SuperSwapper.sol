@@ -44,36 +44,57 @@ contract SuperSwapper is Ownable {
     require(amounts.length == chainIds.length, 'Invalid input');
     require(amounts.length > 0, 'Invalid input');
 
+    uint256 totalAmount = 0;
+    for (uint256 i = 0; i < amounts.length; i++) {
+      totalAmount += amounts[i];
+    }
+
+    IERC20(tokenIn).transferFrom(msg.sender, address(this), totalAmount);
+
     for (uint256 i = 0; i < amounts.length; i++) {
       uint256 amount = amounts[i];
       uint256 chainId = chainIds[i];
 
-      bridge.sendERC20(tokenIn, address(this), amount, chainId);
-      //   emit SwapInitiated(tokenIn, amount, chainId);
-      messenger.sendMessage(
-        chainId,
-        address(this),
-        abi.encodeWithSelector(
-          SuperSwapper.executeSwap.selector,
-          block.chainid,
-          msg.sender,
-          tokenIn,
-          amount
-        )
-      );
+      if (chainId == block.chainid) {
+        (address tokenOut, uint256 amountOut) = _executeSwap(tokenIn, amount);
+        IERC20(tokenOut).transfer(msg.sender, amountOut);
+      } else {
+        bridge.sendERC20(tokenIn, address(this), amount, chainId);
+        //   emit SwapInitiated(tokenIn, amount, chainId);
+        messenger.sendMessage(
+          chainId,
+          address(this),
+          abi.encodeWithSelector(
+            SuperSwapper.relaySwap.selector,
+            block.chainid,
+            msg.sender,
+            tokenIn,
+            amount
+          )
+        );
+      }
     }
   }
-  function executeSwap(
+  // TODO: keep track of failing swaps for refunds
+  function relaySwap(
     uint256 sourceChainId,
     address receiver,
     address tokenIn,
     uint256 amountIn
   ) external {
+    // TODO: Add this back in
     // CrossDomainMessageLib.requireCrossDomainCallback();
+    (address tokenOut, uint256 amountOut) = _executeSwap(tokenIn, amountIn);
+    bridge.sendERC20(tokenOut, receiver, amountOut, sourceChainId);
+  }
 
+  function _executeSwap(
+    address tokenIn,
+    uint256 amountIn
+  ) internal returns (address tokenOut, uint256 amountOut) {
     IERC20(tokenIn).approve(address(uniswapV2Router), amountIn);
 
-    address tokenOut = tokenIn == SUPERTOKEN9000 ? SUPERWETH : SUPERTOKEN9000;
+    tokenOut = tokenIn == SUPERTOKEN9000 ? SUPERWETH : SUPERTOKEN9000;
     address[] memory path = new address[](2);
     path[0] = tokenIn;
     path[1] = tokenOut;
@@ -86,6 +107,6 @@ contract SuperSwapper is Ownable {
       block.timestamp + 1000
     );
 
-    bridge.sendERC20(tokenOut, receiver, amountsOut[1], sourceChainId);
+    amountOut = amountsOut[1];
   }
 }

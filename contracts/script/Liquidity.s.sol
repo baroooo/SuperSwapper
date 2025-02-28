@@ -132,7 +132,7 @@ contract Liquidity is Script {
       console.log('Token A:', tokenA, 'Amount:', amountA);
       console.log('Token B:', tokenB, 'Amount:', amountB);
 
-      // Add liquidity
+      // deploying more capital steady lads
       (uint amountAAdded, uint amountBAdded, uint liquidity) = IUniswapV2Router02(ROUTER)
         .addLiquidity(
           tokenA,

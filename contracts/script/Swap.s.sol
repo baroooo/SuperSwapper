@@ -16,7 +16,7 @@ interface ISuperSwapper {
 
 contract SwapScript is Script {
   // Address of the deployed SuperSwapper contract
-  address public constant SUPERSWAPPER_ADDRESS = 0xe05ba9c8827072e1508099E1797BA84baC657012; // REPLACE WITH ACTUAL ADDRESS
+  address public constant SUPERSWAPPER_ADDRESS = 0x141Cf3C1Cd0884A9170Aab82815589483EdB1741; // REPLACE WITH ACTUAL ADDRESS
 
   function run() external {
     vm.createSelectFork('http://localhost:9545');
@@ -29,18 +29,17 @@ contract SwapScript is Script {
     ISuperSwapper swapper = ISuperSwapper(SUPERSWAPPER_ADDRESS);
 
     // // Define parameters for initiateSwap
-    address tokenIn = 0xf793A6B9587e09e6149Ea99Ed638DE0655CcfcB8; // Using the constant from SuperSwapper
+    address tokenIn = swapper.SUPERTOKEN9000(); // Using the constant from SuperSwapper
     console.log('Token in:', tokenIn);
-    // // Example: Swap to 3 different chains with different amounts
-    uint256[] memory amounts = new uint256[](1);
+    uint256[] memory amounts = new uint256[](2);
     amounts[0] = 1 ether; // Amount for first chain
-    // amounts[1] = 2 ether; // Amount for second chain
+    amounts[1] = 2 ether; // Amount for second chain
 
-    uint256[] memory chainIds = new uint256[](1);
-    // chainIds[0] = 10; // Optimism
-    chainIds[0] = 8453; // Base
+    uint256[] memory chainIds = new uint256[](2);
+    chainIds[0] = 10; // Optimism
+    chainIds[1] = 8453; // Base
 
-    IERC20(tokenIn).transfer(SUPERSWAPPER_ADDRESS, amounts[0]);
+    IERC20(tokenIn).approve(SUPERSWAPPER_ADDRESS, amounts[0] + amounts[1]);
     // Call initiateSwap function
     swapper.initiateSwap(tokenIn, amounts, chainIds);
 
