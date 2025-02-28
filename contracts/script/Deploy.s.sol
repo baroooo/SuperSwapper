@@ -12,7 +12,11 @@ import { SuperSwapper } from '../src/SuperSwapper.sol';
 // Example forge script for deploying as an alternative to sup: super-cli (https://github.com/ethereum-optimism/super-cli)
 contract Deploy is Script {
   /// @notice Array of RPC URLs to deploy to, deploy to supersim 901 and 902 by default.
-  string[] private rpcUrls = ['http://localhost:9545', 'http://localhost:9546'];
+  string[] private rpcUrls = [
+    'http://localhost:9545',
+    'http://localhost:9546',
+    'http://localhost:9547'
+  ];
 
   /// @notice Modifier that wraps a function in broadcasting.
   modifier broadcast() {
@@ -26,6 +30,8 @@ contract Deploy is Script {
   function run() public {
     uniswapV2Routers[10] = 0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2;
     uniswapV2Routers[8453] = 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
+    uniswapV2Routers[34443] = 0x28108b86bb717A3557fb5d4A05A9249333dd7c96;
+
     for (uint256 i = 0; i < rpcUrls.length; i++) {
       string memory rpcUrl = rpcUrls[i];
 

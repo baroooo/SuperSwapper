@@ -31,15 +31,17 @@ contract SwapScript is Script {
     // // Define parameters for initiateSwap
     address tokenIn = swapper.SUPERTOKEN9000(); // Using the constant from SuperSwapper
     console.log('Token in:', tokenIn);
-    uint256[] memory amounts = new uint256[](2);
+    uint256[] memory amounts = new uint256[](3);
     amounts[0] = 1 ether; // Amount for first chain
     amounts[1] = 2 ether; // Amount for second chain
+    amounts[2] = 0.5 ether; // Amount for third chain
 
-    uint256[] memory chainIds = new uint256[](2);
+    uint256[] memory chainIds = new uint256[](3);
     chainIds[0] = 10; // Optimism
     chainIds[1] = 8453; // Base
+    chainIds[2] = 34443; // Mode
 
-    IERC20(tokenIn).approve(SUPERSWAPPER_ADDRESS, amounts[0] + amounts[1]);
+    IERC20(tokenIn).approve(SUPERSWAPPER_ADDRESS, amounts[0] + amounts[1] + amounts[2]);
     // Call initiateSwap function
     swapper.initiateSwap(tokenIn, amounts, chainIds);
 

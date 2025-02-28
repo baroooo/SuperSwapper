@@ -59,7 +59,11 @@ interface IUniswapV2Factory {
 }
 
 contract Liquidity is Script {
-  string[] private rpcUrls = ['http://localhost:9545', 'http://localhost:9546'];
+  string[] private rpcUrls = [
+    'http://localhost:9545',
+    'http://localhost:9546',
+    'http://localhost:9547'
+  ];
 
   // Uniswap V2 Factory on Ethereum mainnet
   mapping(uint256 => address) public uniswapV2Factories;
@@ -85,11 +89,13 @@ contract Liquidity is Script {
   function run() public {
     uniswapV2Factories[10] = 0x0c3c1c532F1e39EdF36BE9Fe0bE1410313E074Bf;
     uniswapV2Factories[8453] = 0x8909Dc15e40173Ff4699343b6eB8132c65e18eC6;
+    uniswapV2Factories[34443] = 0x50fD14F0eba5A678c1eBC16bDd3794f09362a95C;
     uniswapV2Routers[10] = 0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2;
     uniswapV2Routers[8453] = 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
+    uniswapV2Routers[34443] = 0x28108b86bb717A3557fb5d4A05A9249333dd7c96;
     wethAddresses[10] = 0x4200000000000000000000000000000000000024; // OP Mainnet WETH
     wethAddresses[8453] = 0x4200000000000000000000000000000000000024; // Base WETH
-
+    wethAddresses[34443] = 0x4200000000000000000000000000000000000024; // Mode WETH
     for (uint256 i = 0; i < rpcUrls.length; i++) {
       string memory rpcUrl = rpcUrls[i];
 
