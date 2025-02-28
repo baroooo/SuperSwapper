@@ -26,9 +26,19 @@ contract SuperSwapper is Ownable {
   address public SUPERTOKEN9000;
   address public constant SUPERWETH = 0x4200000000000000000000000000000000000024;
 
+  mapping(address => mapping(address => uint256)) public failedSwaps;
+
+  // supported chainIds
+  uint256[] public supportedChainIds;
+
   constructor(address owner_) Ownable() {
     _initializeOwner(owner_);
     IERC20(SUPERWETH).approve(address(bridge), type(uint256).max);
+
+    supportedChainIds.push(10);
+    supportedChainIds.push(8453);
+    supportedChainIds.push(34443);
+    supportedChainIds.push(130);
   }
 
   function setSuperToken9000(address superToken9000_) external onlyOwner {
@@ -38,6 +48,10 @@ contract SuperSwapper is Ownable {
 
   function setUniswapV2Router(address uniswapV2Router_) external onlyOwner {
     uniswapV2Router = uniswapV2Router_;
+  }
+
+  function getFailedSwaps(address user, address tokenIn) external view returns (uint256) {
+    return failedSwaps[user][tokenIn];
   }
 
   function initiateSwap(
@@ -61,7 +75,11 @@ contract SuperSwapper is Ownable {
 
       if (chainId == block.chainid) {
         (address tokenOut, uint256 amountOut) = _executeSwap(tokenIn, amount);
-        IERC20(tokenOut).transfer(msg.sender, amountOut);
+        if (amountOut > 0) {
+          IERC20(tokenOut).transfer(msg.sender, amountOut);
+        } else {
+          failedSwaps[msg.sender][tokenIn] += amount;
+        }
       } else {
         bridge.sendERC20(tokenIn, address(this), amount, chainId);
         //   emit SwapInitiated(tokenIn, amount, chainId);
@@ -79,7 +97,6 @@ contract SuperSwapper is Ownable {
       }
     }
   }
-  // TODO: keep track of failing swaps for refunds
   function relaySwap(
     uint256 sourceChainId,
     address receiver,
@@ -88,7 +105,12 @@ contract SuperSwapper is Ownable {
   ) external {
     CrossDomainMessageLib.requireCrossDomainCallback();
     (address tokenOut, uint256 amountOut) = _executeSwap(tokenIn, amountIn);
-    bridge.sendERC20(tokenOut, receiver, amountOut, sourceChainId);
+
+    if (amountOut > 0) {
+      bridge.sendERC20(tokenOut, receiver, amountOut, sourceChainId);
+    } else {
+      failedSwaps[receiver][tokenIn] += amountIn;
+    }
   }
 
   function _executeSwap(
@@ -102,14 +124,54 @@ contract SuperSwapper is Ownable {
     path[0] = tokenIn;
     path[1] = tokenOut;
 
-    uint256[] memory amountsOut = IUniswapV2Router(uniswapV2Router).swapExactTokensForTokens(
-      amountIn,
-      0,
-      path,
-      address(this),
-      block.timestamp + 1000
-    );
+    try
+      IUniswapV2Router(uniswapV2Router).swapExactTokensForTokens(
+        amountIn,
+        0,
+        path,
+        address(this),
+        block.timestamp + 1000
+      )
+    returns (uint256[] memory amounts) {
+      amountOut = amounts[1];
+    } catch (bytes memory reason) {}
+  }
 
-    amountOut = amountsOut[1];
+  function withdraw(address tokenIn) external {
+    require(tokenIn == SUPERTOKEN9000 || tokenIn == SUPERWETH, 'Invalid token');
+
+    uint256 amount = failedSwaps[msg.sender][tokenIn];
+
+    if (amount > 0) {
+      failedSwaps[msg.sender][tokenIn] = 0;
+      IERC20(tokenIn).transfer(msg.sender, amount);
+    }
+
+    for (uint256 i = 0; i < supportedChainIds.length; i++) {
+      uint256 chainId = supportedChainIds[i];
+      if (chainId == block.chainid) {
+        continue;
+      }
+      messenger.sendMessage(
+        chainId,
+        address(this),
+        abi.encodeWithSelector(
+          SuperSwapper.crossChainWithdraw.selector,
+          block.chainid,
+          msg.sender,
+          tokenIn
+        )
+      );
+    }
+  }
+
+  function crossChainWithdraw(uint256 chainId, address receiver, address tokenIn) external {
+    CrossDomainMessageLib.requireCrossDomainCallback();
+    uint256 amount = failedSwaps[receiver][tokenIn];
+    require(amount > 0, 'No failed swaps');
+
+    failedSwaps[receiver][tokenIn] = 0;
+
+    bridge.sendERC20(tokenIn, receiver, amount, chainId);
   }
 }
