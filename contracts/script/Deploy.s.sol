@@ -33,7 +33,7 @@ contract Deploy is Script {
   function deployInitialSupplySuperchainERC20Contract() public broadcast returns (address addr_) {
     bytes memory initCode = abi.encodePacked(
       type(InitialSupplySuperchainERC20).creationCode,
-      abi.encode(msg.sender, 'Test', 'TEST', 18, 1000, 10)
+      abi.encode(msg.sender, 'Test', 'TEST', 18, 1_000_000e18, 10)
     );
     addr_ = DeployUtils.deployContract('InitialSupplySuperchainERC20', _implSalt(), initCode);
   }

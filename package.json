@@ -10,6 +10,7 @@
     "dev:frontend": "vite",
     "dev:supersim": "pnpm supersim fork --chains=op,base --interop.autorelay --logs.directory supersim-logs",
     "dev:deploy": "cd contracts && forge script script/Deploy.s.sol --broadcast --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+    "dev:liquidity": "cd contracts && forge script script/Liquidity.s.sol --broadcast --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
     "build:frontend": "vite build",
     "build:contracts": "forge build --root contracts",
     "deploy:supersim": "pnpm build:contracts && sup deploy create2 --chains supersiml2a,supersiml2b --salt test-salt-0 --forge-artifact-path ./contracts/out/InitialSupplySuperchainERC20.sol/InitialSupplySuperchainERC20.json --constructor-args 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,TestSuperchainERC20,TSE,18,1000000000000000000000000000,901 --network supersim --private-key 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a",
