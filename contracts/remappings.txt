@@ -1,0 +1,2 @@
+@interop-lib/=lib/interop-lib/src/
+@openzeppelin/=lib/openzeppelin-contracts/

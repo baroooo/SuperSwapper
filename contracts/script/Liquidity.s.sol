@@ -87,8 +87,8 @@ contract Liquidity is Script {
     uniswapV2Factories[8453] = 0x8909Dc15e40173Ff4699343b6eB8132c65e18eC6;
     uniswapV2Routers[10] = 0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2;
     uniswapV2Routers[8453] = 0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
-    wethAddresses[10] = 0x4200000000000000000000000000000000000006; // OP Mainnet WETH
-    wethAddresses[8453] = 0x4200000000000000000000000000000000000006; // Base WETH
+    wethAddresses[10] = 0x4200000000000000000000000000000000000024; // OP Mainnet WETH
+    wethAddresses[8453] = 0x4200000000000000000000000000000000000024; // Base WETH
 
     for (uint256 i = 0; i < rpcUrls.length; i++) {
       string memory rpcUrl = rpcUrls[i];
