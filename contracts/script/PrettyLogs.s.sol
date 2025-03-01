@@ -48,20 +48,20 @@ contract LogState is Script {
   }
 
   function prettyBalances() public {
-    console2.log('===================================== Balances =====================================');
-    console2.log('Chain\t\t\t\t\tST9000\t\t\t\t\tWETH\n');
+    console2.log('=================================================== Balances ====================================================');
+    console2.log('Chain\t\t\t\t\tST9000\t\t\t\t\t\t\tWETH\n');
     for (uint256 i = 0; i < rpcs.length; i++) {
       vm.createSelectFork(rpcs[i]);
-      console2.log('%s\t\t\t\t%d\t\t\t\t\t%d', chainIdToName(block.chainid), 
-        IERC20(SUPERTOKEN9000).balanceOf(SUPERSWAPPER_ADDRESS) / 1e18,
-        IERC20(SUPERWETH).balanceOf(SUPERSWAPPER_ADDRESS) / 1e18
+      console2.log('%s\t\t\t\t%d\t\t\t\t%d', chainIdToName(block.chainid), 
+        IERC20(SUPERTOKEN9000).balanceOf(trader),
+        IERC20(SUPERWETH).balanceOf(trader)
       );
     }
   }
 
   function prettyBuckets() public {
-    console2.log('================================= Uniswap Reserves =================================');
-    console2.log('Chain\t\t\t\t\tST9000\t\t\t\t\tWETH\n');
+    console2.log('============================================= Uniswap Reserves ==================================================');
+    console2.log('Chain\t\t\t\t\tST9000\t\t\t\t\t\t\tWETH\n');
     for (uint256 i = 0; i < rpcs.length; i++) {
       vm.createSelectFork(rpcs[i]);
       address factory = uniswapV2Factories[block.chainid];
@@ -69,8 +69,8 @@ contract LogState is Script {
       (uint112 reserve0, uint112 reserve1, ) = IUniswapV2Pair(pair).getReserves();
 
       console2.log('%s\t\t\t\t%d\t\t\t\t\t%d', chainIdToName(block.chainid),
-        reserve0 / 1e18,
-        reserve1 / 1e18
+        reserve1,
+        reserve0
       );
     }
   }
