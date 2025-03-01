@@ -102,11 +102,11 @@ contract Liquidity is Script {
     wethAddresses[34443] = 0x4200000000000000000000000000000000000024; // Mode WETH
     wethAddresses[130] = 0x4200000000000000000000000000000000000024; // Unichain WETH
 
-    amountA[10] = 10000 * 10 ** 18; // 10000 tokens with 18 decimals on OP
-    amountB[10] = 10 * 10 ** 18; // 10 WETH or equivalent on OP
+    amountA[10] = 12000 * 10 ** 18; // 10000 tokens with 18 decimals on OP
+    amountB[10] = 12 * 10 ** 18; // 10 WETH or equivalent on OP
 
-    amountA[8453] = 10000 * 10 ** 18; // 10000 tokens with 18 decimals on BASE
-    amountB[8453] = 10 * 10 ** 18; // 10 WETH or equivalent on BASE
+    amountA[8453] = 20000 * 10 ** 18; // 10000 tokens with 18 decimals on BASE
+    amountB[8453] = 20 * 10 ** 18; // 10 WETH or equivalent on BASE
 
     amountA[130] = 10000 * 10 ** 18; // 10000 tokens with 18 decimals on UNICHAIN
     amountB[130] = 10 * 10 ** 18; // 10 WETH or equivalent on UNICHAIN
@@ -132,7 +132,7 @@ contract Liquidity is Script {
       // Get WETH first if needed
       if (getWethFirst) {
         console.log('Getting WETH by wrapping ETH');
-        IWETH(WETH).deposit{ value: 10e18 }();
+        IWETH(WETH).deposit{ value: amountB[block.chainid] }();
         console.log('WETH Balance after wrapping:', IERC20(WETH).balanceOf(msg.sender));
       }
 
